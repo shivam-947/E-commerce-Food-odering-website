@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodieExpress - Menu</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .menu-header {
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+                        url('https://images.unsplash.com/photo-1514326640560-7d063ef2aed5');
+            background-size: cover;
+            background-position: center;
+            padding: 100px 0 50px;
+            color: white;
+            text-align: center;
+        }
+
+        .menu-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .menu-category {
+            padding: 60px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .menu-category:last-child {
+            border-bottom: none;
+        }
+
+        .category-title {
+            position: relative;
+            display: inline-block;
+            padding-bottom: 15px;
+            margin-bottom: 40px;
+        }
+
+        .category-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background-color: #ff6f61;
+        }
+
+        .menu-item {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .menu-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .menu-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+            background-color: #f8f9fa; /* Fallback color if image fails to load */
+        }
+
+        .menu-item img:hover {
+            transform: scale(1.05);
+        }
+
+        /* Add loading animation for images */
+        .menu-item img {
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .menu-item-content {
+            padding: 20px;
+        }
+
+        .menu-item-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2C3E50;
+            margin-bottom: 10px;
+        }
+
+        .menu-item-price {
+            color: #ff6f61;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .menu-item-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .quantity-control {
+            background-color: #f8f9fa;
+            border-radius: 25px;
+            padding: 5px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .quantity-btn {
+            background: #f8f9fa;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .quantity-btn:hover {
+            background: #e9ecef;
+        }
+
+        .quantity-input {
+            width: 50px;
+            text-align: center;
+            margin: 0 10px;
+            border: none;
+            background: transparent;
+        }
+
+        #cart-toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .btn-custom {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-custom::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn-custom:hover::after {
+            width: 300px;
+            height: 300px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">FoodieExpress</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link" href="cart.html">Cart <span id="cart-count">(0)</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="login.html">Login</a></li>
+                    <li class="nav-item"><a class="nav-link" href="logout.html">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Menu Header -->
+    <div class="menu-header">
+        <div class="container">
+            <h1 class="menu-title">Our Menu</h1>
+            <p class="lead">Discover our carefully curated selection of dishes</p>
+        </div>
+    </div>
+
+    <!-- Menu Categories -->
+    <div class="container">
+        <!-- Starters -->
+        <section class="menu-category">
+            <h2 class="category-title">Appetizers & Starters</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="menu-item">
+                        <img src="https://images.unsplash.com/photo-1563379926898-05f4575a45d8" alt="Spring Rolls">
+                        <div class="menu-item-content">
+                            <h3 class="menu-item-title">Crispy Spring Rolls</h3>
+                            <div class="menu-item-price">$8.99</div>
+                            <p class="menu-item-description">Golden-fried vegetable spring rolls served with sweet chili sauce</p>
+                            <div class="quantity-control">
+                                <button class="quantity-btn" onclick="updateQuantity('spring-rolls', -1)">-</button>
+                                <input type="number" class="quantity-input" id="spring-rolls-qty" value="1" min="1">
+                                <button class="quantity-btn" onclick="updateQuantity('spring-rolls', 1)">+</button>
+                            </div>
+                            <button class="btn btn-custom w-100" onclick="addToCart('Spring Rolls', 8.99, 'spring-rolls')">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="menu-item">
+                        <img src="https://images.unsplash.com/photo-1599487488170-d11ec9c172f0" alt="Paneer Tikka">
+                        <div class="menu-item-content">
+                            <h3 class="menu-item-title">Paneer Tikka</h3>
+                            <div class="menu-item-price">$12.99</div>
+                            <p class="menu-item-description">Marinated cottage cheese cubes grilled to perfection with bell peppers</p>
+                            <div class="quantity-control">
+                                <button class="quantity-btn" onclick="updateQuantity('paneer-tikka', -1)">-</button>
+                                <input type="number" class="quantity-input" id="paneer-tikka-qty" value="1" min="1">
+                                <button class="quantity-btn" onclick="updateQuantity('paneer-tikka', 1)">+</button>
+                            </div>
+                            <button class="btn btn-custom w-100" onclick="addToCart('Paneer Tikka', 12.99, 'paneer-tikka')">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="menu-item">
+                        <img src="https://images.unsplash.com/photo-1572695157366-5e585ab2b69f" alt="Bruschetta">
+                        <div class="menu-item-content">
+                            <h3 class="menu-item-title">Classic Bruschetta</h3>
+                            <div class="menu-item-price">$9.99</div>
+                            <p class="menu-item-description">Toasted bread topped with fresh tomatoes, basil, and extra virgin olive oil</p>
+                            <div class="quantity-control">
+                                <button class="quantity-btn" onclick="updateQuantity('bruschetta', -1)">-</button>
+                                <input type="number" class="quantity-input" id="bruschetta-qty" value="1" min="1">
+                                <button class="quantity-btn" onclick="updateQuantity('bruschetta', 1)">+</button>
+                            </div>
+                            <button class="btn btn-custom w-100" onclick="addToCart('Bruschetta', 9.99, 'bruschetta')">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="menu-item">
+                        <img src="https://images.unsplash.com/photo-1608039755401-742074f0548d" alt="Chicken Wings">
+                        <div class="menu-item-content">
+                            <h3 class="menu-item-title">Spicy Chicken Wings</h3>
+                            <div class="menu-item-price">$11.99</div>
+                            <p class="menu-item-description">Crispy wings tossed in our signature hot sauce, served with blue cheese dip</p>
+                            <div class="quantity-control">
+                                <button class="quantity-btn" onclick="updateQuantity('wings', -1)">-</button>
+                                <input type="number" class="quantity-input" id="wings-qty" value="1" min="1">
+                                <button class="quantity-btn" onclick="updateQuantity('wings', 1)">+</button>
+                            </div>
+                            <button class="btn btn-custom w-100" onclick="addToCart('Spicy Chicken Wings', 11.99, 'wings')">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- North Indian Cuisine -->
+        <section class="menu-category">
+            <h2 class="category-title">North Indian Delicacies</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="menu-item">
+                        <img src="https://images.unsplash.com/photo-1585937421612-70a008356fbe" alt="Butter Chicken">
+                        <div class="menu-item-content">
+                            <h3 class="menu-item-title">Butter Chicken</h3>
+                            <div class="menu-item-price">$16.99</div>
+                            <p class="menu-item-description">Tender chicken in rich tomato-butter gravy with aromatic spices</p>
+                            <div class="quantity-control">
+                                <button class="quantity-btn" onclick="updateQuantity('butter-chicken', -1)">-</button>
+                                <input type="number" class="quantity-input" id="butter-chicken-qty" value="1" min="1">
+                                <button class="quantity-btn" onclick="updateQuantity('butter-chicken', 1)">+</button>
+                            </div>
+                            <button class="btn btn-custom w-100" onclick="addToCart('Butter Chicken', 16.99, 'butter-chicken')">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="menu-item">
+                        <img src="https://images.unsplash.com/photo-1631452180519-c014fe946bc7" alt="Dal Makhani">
+                        <div class="menu-item-content">
+                            <h3 class="menu-item-title">Dal Makhani</h3>
+                            <div class="menu-item-price">$14.99</div>
+                            <p class="menu-item-description">Creamy black lentils simmered overnight with butter and spices</p>
+                            <div class="quantity-control">
+                                <button class="quantity-btn" onclick="updateQuantity('dal-makhani', -1)">-</button>
+                                <input type="number" class="quantity-input" id="dal-makhani-qty" value="1" min="1">
+                                <button class="quantity-btn" onclick="updateQuantity('dal-makhani', 1)">+</button>
+                            </div>
+                            <button class="btn btn-custom w-100" onclick="addToCart('Dal Makhani', 14.99, 'dal-makhani')">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="menu-item">
+                        <img src="https://images.unsplash.com/photo-1613292443284-8d10ef9383fe" alt="Naan Bread">
+                        <div class="menu-item-content">
+                            <h3 class="menu-item-title">Garlic Naan</h3>
+                            <div class="menu-item-price">$3.99</div>
+                            <p class="menu-item-description">Freshly baked bread with garlic butter and herbs</p>
+                            <div class="quantity-control">
+                                <button class="quantity-btn" onclick="updateQuantity('naan', -1)">-</button>
+                                <input type="number" class="quantity-input" id="naan-qty" value="1" min="1">
+                                <button class="quantity-btn" onclick="updateQuantity('naan', 1)">+</button>
+                            </div>
+                            <button class="btn btn-custom w-100" onclick="addToCart('Garlic Naan', 3.99, 'naan')">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="menu-item">
+                        <img src="https://images.unsplash.com/photo-1645177628172-a94c1f96e6db" alt="Biryani">
+                        <div class="menu-item-content">
+                            <h3 class="menu-item-title">Chicken Biryani</h3>
+                            <div class="menu-item-price">$17.99</div>
+                            <p class="menu-item-description">Fragrant basmati rice cooked with tender chicken and aromatic spices</p>
+                            <div class="quantity-control">
+                                <button class="quantity-btn" onclick="updateQuantity('biryani', -1)">-</button>
+                                <input type="number" class="quantity-input" id="biryani-qty" value="1" min="1">
+                                <button class="quantity-btn" onclick="updateQuantity('biryani', 1)">+</button>
+                            </div>
+                            <button class="btn btn-custom w-100" onclick="addToCart('Chicken Biryani', 17.99, 'biryani')">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- South Indian Cuisine -->
+        <section class="menu-category">
+            <h2 class="category-title">South Indian Specialties</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="menu-item">
+                        <img src="https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=800&q=80" alt="Masala Dosa">
+                        <div class="menu-item-content">
+                            <h3 class="menu-item-title">Masala Dosa</h3>
+                            <div class="menu-item-price">$13.99</div>
+                            <p class="menu-item-description">Crispy rice crepe filled with spiced potato, served with chutneys</p>
+                            <div class="quantity-control">
+                                <button class="quantity-btn" onclick="updateQuantity('masala-dosa', -1)">-</button>
+                                <input type="number" class="quantity-input" id="masala-dosa-qty" value="1" min="1">
+                                <button class="quantity-btn" onclick="updateQuantity('masala-dosa', 1)">+</button>
+                            </div>
+                            <button class="btn btn-custom w-100" onclick="addToCart('Masala Dosa', 13.99, 'masala-dosa')">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="menu-item">
+                        <img src="https://images.unsplash.com/photo-1626074353765-517a681e40be?auto=format&fit=crop&w=800&q=80" alt="Idli Sambar">
+                        <div class="menu-item-content">
+                            <h3 class="menu-item-title">Idli Sambar</h3>
+                            <div class="menu-item-price">$10.99</div>
+                            <p class="menu-item-description">Steamed rice cakes served with lentil soup and coconut chutney</p>
+                            <div class="quantity-control">
+                                <button class="quantity-btn" onclick="updateQuantity('idli', -1)">-</button>
+                                <input type="number" class="quantity-input" id="idli-qty" value="1" min="1">
+                                <button class="quantity-btn" onclick="updateQuantity('idli', 1)">+</button>
+                            </div>
+                            <button class="btn btn-custom w-100" onclick="addToCart('Idli Sambar', 10.99, 'idli')">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="menu-item">
+                        <img src="https://images.unsplash.com/photo-1589302168068-964664d93dc0?auto=format&fit=crop&w=800&q=80" alt="Hyderabadi Biryani">
+                        <div class="menu-item-content">
+                            <h3 class="menu-item-title">Hyderabadi Biryani</h3>
+                            <div class="menu-item-price">$18.99</div>
+                            <p class="menu-item-description">Traditional spiced rice with tender lamb, served with raita</p>
+                            <div class="quantity-control">
+                                <button class="quantity-btn" onclick="updateQuantity('hyd-biryani', -1)">-</button>
+                                <input type="number" class="quantity-input" id="hyd-biryani-qty" value="1" min="1">
+                                <button class="quantity-btn" onclick="updateQuantity('hyd-biryani', 1)">+</button>
+                            </div>
+                            <button class="btn btn-custom w-100" onclick="addToCart('Hyderabadi Biryani', 18.99, 'hyd-biryani')">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Italian Cuisine -->
+        <section class="menu-category">
+            <h2 class="category-title">Italian Favorites</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="menu-item">
+                        <img src="https://images.unsplash.com/photo-1604068549290-dea0e4a305ca" alt="Margherita Pizza">
+                        <div class="menu-item-content">
+                            <h3 class="menu-item-title">Margherita Pizza</h3>
+                            <div class="menu-item-price">$15.99</div>
+                            <p class="menu-item-description">Classic pizza with fresh mozzarella, tomatoes, and basil</p>
+                            <div class="quantity-control">
+                                <button class="quantity-btn" onclick="updateQuantity('margherita', -1)">-</button>
+                                <input type="number" class="quantity-input" id="margherita-qty" value="1" min="1">
+                                <button class="quantity-btn" onclick="updateQuantity('margherita', 1)">+</button>
+                            </div>
+                            <button class="btn btn-custom w-100" onclick="addToCart('Margherita Pizza', 15.99, 'margherita')">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="menu-item">
+                        <img src="https://images.unsplash.com/photo-1551183053-bf91a1d81141" alt="Pasta Carbonara">
+                        <div class="menu-item-content">
+                            <h3 class="menu-item-title">Pasta Carbonara</h3>
+                            <div class="menu-item-price">$14.99</div>
+                            <p class="menu-item-description">Spaghetti with creamy sauce, pancetta, and parmesan</p>
+                            <div class="quantity-control">
+                                <button class="quantity-btn" onclick="updateQuantity('carbonara', -1)">-</button>
+                                <input type="number" class="quantity-input" id="carbonara-qty" value="1" min="1">
+                                <button class="quantity-btn" onclick="updateQuantity('carbonara', 1)">+</button>
+                            </div>
+                            <button class="btn btn-custom w-100" onclick="addToCart('Pasta Carbonara', 14.99, 'carbonara')">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="menu-item">
+                        <img src="https://images.unsplash.com/photo-1595854341625-f33ee10dbf94" alt="Fettuccine Alfredo">
+                        <div class="menu-item-content">
+                            <h3 class="menu-item-title">Fettuccine Alfredo</h3>
+                            <div class="menu-item-price">$16.99</div>
+                            <p class="menu-item-description">Creamy pasta with parmesan cheese sauce and fresh herbs</p>
+                            <div class="quantity-control">
+                                <button class="quantity-btn" onclick="updateQuantity('alfredo', -1)">-</button>
+                                <input type="number" class="quantity-input" id="alfredo-qty" value="1" min="1">
+                                <button class="quantity-btn" onclick="updateQuantity('alfredo', 1)">+</button>
+                            </div>
+                            <button class="btn btn-custom w-100" onclick="addToCart('Fettuccine Alfredo', 16.99, 'alfredo')">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Cart Toast Notification -->
+    <div class="toast-container">
+        <div id="cart-toast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    Item added to cart successfully!
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let cart = [];
+
+        function updateQuantity(itemId, change) {
+            const input = document.getElementById(`${itemId}-qty`);
+            let value = parseInt(input.value) + change;
+            input.value = Math.max(1, value);
+        }
+
+        function addToCart(name, price, itemId) {
+            const quantity = parseInt(document.getElementById(`${itemId}-qty`).value);
+            const imageUrl = document.querySelector(`#${itemId}-qty`).closest('.menu-item').querySelector('img').src;
+            
+            cart.push({
+                name: name,
+                price: price,
+                quantity: quantity,
+                imageUrl: imageUrl,
+                id: itemId
+            });
+            
+            // Update cart count
+            document.getElementById('cart-count').textContent = `(${cart.length})`;
+            
+            // Show toast notification
+            const toast = new bootstrap.Toast(document.getElementById('cart-toast'));
+            toast.show();
+
+            // Save cart to localStorage
+            localStorage.setItem('cart', JSON.stringify(cart));
+        }
+
+        // Load cart from localStorage
+        window.onload = function() {
+            const savedCart = localStorage.getItem('cart');
+            if (savedCart) {
+                cart = JSON.parse(savedCart);
+                document.getElementById('cart-count').textContent = `(${cart.length})`;
+            }
+        }
+    </script>
+</body>
+</html> 

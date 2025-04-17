@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodieExpress - Cart</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .cart-container {
+            padding-top: 100px;
+            min-height: 100vh;
+        }
+        .cart-item {
+            border-radius: 10px;
+            margin-bottom: 15px;
+            transition: transform 0.3s ease;
+        }
+        .cart-item:hover {
+            transform: translateY(-5px);
+        }
+        .total-section {
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            position: sticky;
+            top: 100px;
+        }
+        .cart-item img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .btn-order {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn-order:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 100%;
+            background: linear-gradient(45deg, #20c997, #28a745);
+            transition: all 0.5s ease;
+            z-index: -1;
+        }
+
+        .btn-order:hover:before {
+            width: 100%;
+        }
+
+        .btn-order:hover {
+            transform: translateY(-3px);
+            color: white;
+            box-shadow: 0 7px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-order:active {
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">FoodieExpress</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="cart.html">Cart <span id="cart-count">(0)</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="login.html">Login</a></li>
+                    <li class="nav-item"><a class="nav-link" href="logout.html">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="cart-container">
+        <div class="container">
+            <h2 class="mb-4">Your Cart</h2>
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="cart-items" id="cart-items">
+                        <!-- Cart items will be dynamically added here -->
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="total-section shadow-sm">
+                        <h4>Order Summary</h4>
+                        <hr>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Subtotal</span>
+                            <span id="subtotal">$0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Delivery Fee</span>
+                            <span>$2.00</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between mb-4">
+                            <strong>Total</strong>
+                            <strong id="total">$0.00</strong>
+                        </div>
+                        <div class="d-flex flex-column gap-3">
+                            <button class="btn btn-custom w-100" onclick="proceedToCheckout()">Proceed to Checkout</button>
+                            <button class="btn btn-order w-100" onclick="placeOrder()">Order Now</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let cart = [];
+
+        function loadCart() {
+            const savedCart = localStorage.getItem('cart');
+            if (savedCart) {
+                cart = JSON.parse(savedCart);
+                displayCart();
+                updateTotals();
+            }
+        }
+
+        function displayCart() {
+            const cartContainer = document.getElementById('cart-items');
+            cartContainer.innerHTML = '';
+
+            cart.forEach((item, index) => {
+                const cartItem = document.createElement('div');
+                cartItem.className = 'card cart-item shadow-sm';
+                cartItem.innerHTML = `
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <img src="${item.imageUrl}" alt="${item.name}" class="rounded me-3" style="width: 100px; height: 100px; object-fit: cover;">
+                            <div>
+                                <h5 class="card-title mb-1">${item.name}</h5>
+                                <p class="card-text text-muted mb-0">$${item.price.toFixed(2)}</p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <button class="btn btn-sm btn-outline-secondary me-2" onclick="updateCartQuantity(${index}, -1)">-</button>
+                            <span>${item.quantity}</span>
+                            <button class="btn btn-sm btn-outline-secondary ms-2" onclick="updateCartQuantity(${index}, 1)">+</button>
+                            <button class="btn btn-sm btn-danger ms-3" onclick="removeFromCart(${index})">Remove</button>
+                        </div>
+                    </div>
+                `;
+                cartContainer.appendChild(cartItem);
+            });
+
+            // Update cart count
+            document.getElementById('cart-count').textContent = `(${cart.length})`;
+        }
+
+        function updateCartQuantity(index, change) {
+            cart[index].quantity = Math.max(1, cart[index].quantity + change);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            displayCart();
+            updateTotals();
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            displayCart();
+            updateTotals();
+        }
+
+        function updateTotals() {
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const deliveryFee = 2.00;
+            const total = subtotal + deliveryFee;
+
+            document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
+            document.getElementById('total').textContent = `$${total.toFixed(2)}`;
+        }
+
+        function proceedToCheckout() {
+            // Add checkout functionality here
+            alert('Proceeding to checkout...');
+        }
+
+        function placeOrder() {
+            // Add loading effect to button
+            const orderBtn = document.querySelector('.btn-order');
+            orderBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+            orderBtn.disabled = true;
+
+            // Simulate processing delay
+            setTimeout(() => {
+                // Clear cart
+                cart = [];
+                localStorage.removeItem('cart');
+                
+                // Redirect to order confirmation page
+                window.location.href = 'order-confirmed.html';
+            }, 1500);
+        }
+
+        // Load cart when page loads
+        window.onload = loadCart;
+    </script>
+</body>
+</html> 
